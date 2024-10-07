@@ -1,15 +1,16 @@
 pipeline {
-    agent {
-        label 'master'
-    }
+    agent any
     stages {
-        stage('Check Python') {
+        stage('Install Python & Pip') {
             steps {
-                bat 'python --version'
-                bat 'pip --version'
+                // Kiểm tra nếu Python đã được cài đặt
+                bat 'python --version || (echo Installing Python... && powershell -command "Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.12.0/python-3.12.0-amd64.exe -OutFile python-installer.exe; Start-Process python-installer.exe -ArgumentList \'/quiet InstallAllUsers=1 PrependPath=1\' -Wait; del python-installer.exe")'
+                
+                // Kiểm tra nếu Pip đã được cài đặt
+                bat 'pip --version || (echo Installing Pip... && python -m ensurepip --upgrade)'
             }
         }
-        
+
         stage('build') {
             steps {
                 bat 'pip install -r s05\\python-simple-app\\requirements.txt'

@@ -1,37 +1,41 @@
 pipeline {
     agent any
+    environment {
+        // Cập nhật PATH với đường dẫn của Python nếu đã cài sẵn
+        PATH = "C:\\Users\\Admin\\AppData\\Local\\Programs\\Python\\Python312;${env.PATH}"
+    }
+
     stages {
-        stage('Install Python & Pip') {
+        stage('Check Python & Pip') {
             steps {
-                // Kiểm tra nếu Python đã được cài đặt
-                bat 'python --version || (echo Installing Python... && powershell -command "Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.12.0/python-3.12.0-amd64.exe -OutFile python-installer.exe; Start-Process python-installer.exe -ArgumentList \'/quiet InstallAllUsers=1 PrependPath=1\' -Wait; del python-installer.exe")'
-                
-                // Kiểm tra nếu Pip đã được cài đặt
-                bat 'pip --version || (echo Installing Pip... && python -m ensurepip --upgrade)'
+                // Kiểm tra nếu Python và Pip đã có trong PATH
+                bat 'python --version'
+                bat 'pip --version'
             }
         }
 
-        stage('build') {
+        stage('Install Requirements') {
             steps {
                 bat 'pip install -r s05\\python-simple-app\\requirements.txt'
             }
         }
 
-        stage('run') {
+        stage('Run Application') {
             steps {
                 bat 'start /B python s05\\python-simple-app\\app.py'
             }
         }
 
-        stage('test') {
+        stage('Test Application') {
             steps {
-                bat 'timeout /t 60 && curl -s localhost:8000'
+                bat 'timeout /t 10 && curl -s http://localhost:8000'
             }
         }
 
-        stage('cleanup') {
+        stage('Cleanup') {
             steps {
-                bat 'taskkill /F /PID (netstat -ano | findstr ":8000" | findstr /R "[0-9]*$")'
+                // Dừng ứng dụng bằng cách tìm và kết thúc tiến trình
+                bat 'for /f "tokens=5" %a in (\'netstat -ano ^| findstr :8000\') do taskkill /F /PID %a'
             }
         }
     }

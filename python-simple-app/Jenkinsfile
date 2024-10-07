@@ -24,7 +24,8 @@ pipeline {
         }
         stage('test') {
             steps {
-                bat 'powershell -Command "Start-Sleep -Seconds 60; curl http://localhost:8000"'
+                // Sử dụng -UseBasicParsing để tránh lỗi khi chạy curl
+                bat 'powershell -Command "Start-Sleep -Seconds 60; curl http://localhost:8000 -UseBasicParsing"'
             }
         }
         stage('cleanup') {

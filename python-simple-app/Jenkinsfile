@@ -3,6 +3,13 @@ pipeline {
         label 'master'
     }
     stages {
+        stage('Check Python') {
+            steps {
+                bat 'python --version'
+                bat 'pip --version'
+            }
+        }
+        
         stage('build') {
             steps {
                 bat 'pip install -r s05\\python-simple-app\\requirements.txt'

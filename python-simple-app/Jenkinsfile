@@ -1,43 +1,39 @@
 pipeline {
-    agent any
+   agent any
     environment {
-        // Cập nhật PATH với đường dẫn của Python nếu đã cài sẵn
         PYTHON_PATH = 'C:\\Users\\Admin\\AppData\\Local\\Programs\\Python\\Python312'
         PATH = "${env.PATH};${env.PYTHON_PATH};${env.PYTHON_PATH}\\Scripts"
     }
-
     stages {
         stage('Check Python & Pip') {
             steps {
-                // Kiểm tra nếu Python và Pip đã có trong PATH
                 bat 'python --version'
                 bat 'pip --version'
             }
         }
-
-        stage('Install Requirements') {
+        stage('build') {
             steps {
-                bat 'pip install -r s05\\python-simple-app\\requirements.txt'
+                sh 'pip3 install -r s05/python-simple-app/requirements.txt'
             }
         }
 
-        stage('Run Application') {
+        stage('run') {
             steps {
-                bat 'start /B python s05\\python-simple-app\\app.py'
+                sh 'python3 s05/python-simple-app/app.py &'
             }
         }
 
-        stage('Test Application') {
+        stage('test') {
             steps {
-                bat 'timeout /t 10 && curl -s http://localhost:8000'
+                sh 'sleep 60 && curl -s localhost:8000'
             }
         }
 
-        stage('Cleanup') {
+        stage('cleanup') {
             steps {
-                // Dừng ứng dụng bằng cách tìm và kết thúc tiến trình
-                bat 'for /f "tokens=5" %a in (\'netstat -ano ^| findstr :8000\') do taskkill /F /PID %a'
+                sh 'fuser -k 8000/tcp'
             }
         }
+
     }
 }

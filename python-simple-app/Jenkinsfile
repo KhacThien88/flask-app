@@ -2,7 +2,8 @@ pipeline {
     agent any
     environment {
         // Cập nhật PATH với đường dẫn của Python nếu đã cài sẵn
-        PATH = "C:\\Users\\Admin\\AppData\\Local\\Programs\\Python\\Python312;${env.PATH}"
+        PYTHON_PATH = 'C:\\Users\\Admin\\AppData\\Local\\Programs\\Python\\Python312'
+        PATH = "${env.PATH};${env.PYTHON_PATH};${env.PYTHON_PATH}\\Scripts"
     }
 
     stages {
